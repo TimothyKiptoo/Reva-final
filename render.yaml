@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: reva-engineering-inventory
+    runtime: node
+    plan: starter
+    region: frankfurt
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/system/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 10000
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: COMPANY_NAME
+        value: REVA ENGINEERING SERVICES
+      - key: APP_NAME
+        value: REVA Engineering Services Inventory System
+      - key: DEFAULT_ADMIN_EMAIL
+        sync: false
+      - key: DEFAULT_ADMIN_PASSWORD
+        sync: false
+      - key: HEADQUARTERS_EMAIL
+        value: hq@revaengineeringservices.local
+      - key: WAREHOUSE_EMAIL
+        value: warehouse@revaengineeringservices.local
+      - key: ALLOWED_ORIGINS
+        sync: false

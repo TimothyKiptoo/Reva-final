@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>REVA Engineering Services | Inventory System</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body data-theme="dark">
+    <div class="backdrop-orb orb-one"></div>
+    <div class="backdrop-orb orb-two"></div>
+
+    <section id="authView" class="auth-shell">
+      <div class="brand-column">
+        <p class="eyebrow">REVA Engineering Services</p>
+        <h1>Smart Inventory System</h1>
+        <p class="lead">
+          Multi-branch inventory intelligence for REVA Engineering Services with
+          role-based access, barcode and RFID support, fraud detection, offline
+          sync, procurement automation, and live enterprise visibility.
+        </p>
+        <div class="feature-chips">
+          <span>AI Reorder</span>
+          <span>Socket.IO Ready</span>
+          <span>Barcode + RFID</span>
+          <span>Offline Mode</span>
+          <span>Dark Mode</span>
+        </div>
+      </div>
+
+      <form id="loginForm" class="panel auth-card">
+        <div class="panel-head">
+          <p class="eyebrow">Secure Login</p>
+          <h2>Sign in to the inventory grid</h2>
+        </div>
+        <label>
+          <span>Email</span>
+          <input
+            type="email"
+            name="email"
+            value="admin@revaengineeringservices.local"
+            autocomplete="username"
+            required
+          />
+        </label>
+        <label>
+          <span>Password</span>
+          <input
+            type="password"
+            name="password"
+            value="Admin@123"
+            autocomplete="current-password"
+            required
+          />
+        </label>
+        <button type="submit" class="primary-button">Launch Dashboard</button>
+        <p class="helper-text">
+          Seeded administrator:
+          <strong>admin@revaengineeringservices.local / Admin@123</strong>
+        </p>
+        <p id="loginFeedback" class="feedback"></p>
+      </form>
+    </section>
+
+    <section id="appView" class="app-shell hidden">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">REVA Inventory Command Center</p>
+          <h1>REVA Engineering Services</h1>
+        </div>
+        <div class="topbar-actions">
+          <div class="status-pill" id="connectionStatus">Checking network</div>
+          <button id="themeToggle" type="button" class="ghost-button">
+            Toggle Theme
+          </button>
+          <button id="logoutButton" type="button" class="ghost-button">
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <main class="dashboard-grid">
+        <section class="panel hero-panel">
+          <div class="hero-copy">
+            <p class="eyebrow">Role-aware workspace</p>
+            <h2 id="welcomeTitle">Inventory overview</h2>
+            <p id="welcomeText" class="muted">
+              Loading intelligent branch signals and operational alerts.
+            </p>
+          </div>
+          <div class="hero-meta">
+            <div class="mini-stat">
+              <span class="mini-label">Offline Queue</span>
+              <strong id="offlineQueueCount">0</strong>
+            </div>
+            <div class="mini-stat">
+              <span class="mini-label">Realtime</span>
+              <strong id="realtimeMode">SSE</strong>
+            </div>
+            <div class="mini-stat">
+              <span class="mini-label">Current User</span>
+              <strong id="currentUserLabel">...</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="summary-grid" id="summaryGrid"></section>
+
+        <section class="panel insights-panel">
+          <div class="panel-head inline-head">
+            <div>
+              <p class="eyebrow">AI Features</p>
+              <h2>Forecast & Procurement Radar</h2>
+            </div>
+          </div>
+          <div id="suggestionsList" class="insight-list"></div>
+          <div id="fraudWatchlist" class="insight-list compact"></div>
+        </section>
+
+        <section class="panel form-panel" id="itemPanel">
+          <div class="panel-head">
+            <p class="eyebrow">Inventory Entry</p>
+            <h2>Create Stock Item</h2>
+          </div>
+          <form id="itemForm" class="form-grid">
+            <label>
+              <span>Item Name</span>
+              <input name="name" required />
+            </label>
+            <label>
+              <span>Branch</span>
+              <select name="branch" id="itemBranchSelect" required></select>
+            </label>
+            <label>
+              <span>Department</span>
+              <select name="department" id="itemDepartmentSelect" required></select>
+            </label>
+            <label>
+              <span>Category</span>
+              <select name="category" id="itemCategorySelect" required></select>
+            </label>
+            <label>
+              <span>Subcategory</span>
+              <select name="subcategory" id="itemSubcategorySelect" required></select>
+            </label>
+            <label>
+              <span>Supplier</span>
+              <select name="supplier" id="itemSupplierSelect"></select>
+            </label>
+            <label>
+              <span>Barcode</span>
+              <input name="barcode" placeholder="Scan or enter barcode" />
+            </label>
+            <label>
+              <span>RFID Tag</span>
+              <input name="rfidTag" placeholder="Optional RFID tag" />
+            </label>
+            <label>
+              <span>Opening Qty</span>
+              <input name="quantityOnHand" type="number" min="0" value="0" />
+            </label>
+            <label>
+              <span>Min Level</span>
+              <input name="minimumLevel" type="number" min="0" value="5" />
+            </label>
+            <label>
+              <span>Reorder Level</span>
+              <input name="reorderLevel" type="number" min="0" value="10" />
+            </label>
+            <label>
+              <span>Reorder Qty</span>
+              <input name="reorderQuantity" type="number" min="0" value="25" />
+            </label>
+            <label>
+              <span>Unit Cost</span>
+              <input name="unitCost" type="number" min="0" step="0.01" value="0" />
+            </label>
+            <label>
+              <span>Selling Price</span>
+              <input
+                name="sellingPrice"
+                type="number"
+                min="0"
+                step="0.01"
+                value="0"
+              />
+            </label>
+            <label class="full-width">
+              <span>Description</span>
+              <textarea name="description" rows="3"></textarea>
+            </label>
+            <button type="submit" class="primary-button full-width">
+              Save Inventory Item
+            </button>
+          </form>
+          <p id="itemFormFeedback" class="feedback"></p>
+        </section>
+
+        <section class="panel form-panel">
+          <div class="panel-head">
+            <p class="eyebrow">Manual Update After Purchase</p>
+            <h2>Stock Movement & Scanner</h2>
+          </div>
+          <form id="movementForm" class="form-grid">
+            <label class="full-width">
+              <span>Inventory Item</span>
+              <select name="itemId" id="movementItemSelect" required></select>
+            </label>
+            <label>
+              <span>Movement Type</span>
+              <select name="type" required>
+                <option value="purchase">Purchase</option>
+                <option value="sale">Sale</option>
+                <option value="issue">Issue</option>
+                <option value="return">Return</option>
+                <option value="transfer_in">Transfer In</option>
+                <option value="transfer_out">Transfer Out</option>
+                <option value="adjustment">Adjustment</option>
+                <option value="count">Stock Count</option>
+              </select>
+            </label>
+            <label>
+              <span>Quantity</span>
+              <input name="quantity" type="number" step="1" value="1" />
+            </label>
+            <label>
+              <span>Absolute Count Qty</span>
+              <input name="absoluteQuantity" type="number" step="1" value="0" />
+            </label>
+            <label>
+              <span>Channel</span>
+              <select name="channel">
+                <option value="manual">Manual</option>
+                <option value="barcode">Barcode</option>
+                <option value="rfid">RFID</option>
+              </select>
+            </label>
+            <label>
+              <span>Reference</span>
+              <input name="reference" placeholder="PO, GRN, Issue Note..." />
+            </label>
+            <label>
+              <span>Unit Cost</span>
+              <input name="unitCost" type="number" min="0" step="0.01" value="0" />
+            </label>
+            <label class="full-width">
+              <span>Notes</span>
+              <textarea name="notes" rows="3"></textarea>
+            </label>
+            <button type="submit" class="primary-button full-width">
+              Record Movement
+            </button>
+          </form>
+          <div class="scanner-panel">
+            <div class="scanner-head">
+              <h3>Barcode Scanner</h3>
+              <div class="scanner-actions">
+                <button id="scanStartButton" type="button" class="ghost-button">
+                  Start Camera Scan
+                </button>
+                <button id="scanStopButton" type="button" class="ghost-button">
+                  Stop
+                </button>
+              </div>
+            </div>
+            <video id="scannerVideo" autoplay muted playsinline></video>
+            <p id="scannerResult" class="helper-text">
+              Native barcode scanning will use the browser camera when supported.
+            </p>
+          </div>
+          <p id="movementFormFeedback" class="feedback"></p>
+        </section>
+
+        <section class="panel form-panel">
+          <div class="panel-head">
+            <p class="eyebrow">Auto Procurement Suggestions</p>
+            <h2>Purchase Orders</h2>
+          </div>
+          <form id="purchaseOrderForm" class="form-grid">
+            <label>
+              <span>Branch</span>
+              <select name="branch" id="poBranchSelect" required></select>
+            </label>
+            <label>
+              <span>Supplier</span>
+              <select name="supplier" id="poSupplierSelect"></select>
+            </label>
+            <label class="full-width">
+              <span>Item</span>
+              <select name="itemId" id="poItemSelect" required></select>
+            </label>
+            <label>
+              <span>Quantity</span>
+              <input name="quantity" type="number" min="1" value="10" />
+            </label>
+            <label>
+              <span>Unit Cost</span>
+              <input name="unitCost" type="number" min="0" step="0.01" value="0" />
+            </label>
+            <label class="full-width">
+              <span>Reason</span>
+              <textarea
+                name="reason"
+                rows="3"
+                placeholder="AI recommendation or manual procurement note"
+              ></textarea>
+            </label>
+            <button type="submit" class="primary-button full-width">
+              Create Purchase Order
+            </button>
+          </form>
+          <div id="purchaseOrderList" class="order-list"></div>
+          <p id="purchaseFormFeedback" class="feedback"></p>
+        </section>
+
+        <section class="panel form-panel" id="userAdminPanel">
+          <div class="panel-head">
+            <p class="eyebrow">Multi-Location Access</p>
+            <h2>Create Login Accounts</h2>
+          </div>
+          <p id="userAccessText" class="helper-text">
+            Team members in other branches or locations can sign in through your
+            shared system URL once you create their accounts here.
+          </p>
+          <form id="userForm" class="form-grid">
+            <label>
+              <span>Full Name</span>
+              <input name="name" required />
+            </label>
+            <label>
+              <span>Email</span>
+              <input name="email" type="email" required />
+            </label>
+            <label>
+              <span>Password</span>
+              <input name="password" type="password" required />
+            </label>
+            <label>
+              <span>Role</span>
+              <select name="role" id="userRoleSelect" required></select>
+            </label>
+            <label>
+              <span>Branch</span>
+              <select name="branch" id="userBranchSelect"></select>
+            </label>
+            <label>
+              <span>Department</span>
+              <select name="department" id="userDepartmentSelect"></select>
+            </label>
+            <label>
+              <span>Phone</span>
+              <input name="phone" placeholder="+254..." />
+            </label>
+            <label>
+              <span>Dark Mode</span>
+              <select name="darkMode">
+                <option value="true">Enabled</option>
+                <option value="false">Disabled</option>
+              </select>
+            </label>
+            <button type="submit" class="primary-button full-width">
+              Create User Account
+            </button>
+          </form>
+          <div class="table-wrap user-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Branch</th>
+                  <th>Status</th>
+                  <th>Last Login</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="userTableBody"></tbody>
+            </table>
+          </div>
+          <p id="userFormFeedback" class="feedback"></p>
+        </section>
+
+        <section class="panel form-panel" id="aiAgentPanel">
+          <div class="panel-head">
+            <p class="eyebrow">AI Stock Agent</p>
+            <h2>Auto Add Incoming Stock</h2>
+          </div>
+          <form id="aiAgentForm" class="form-grid">
+            <label class="full-width">
+              <span>Incoming Stock Lines</span>
+              <textarea
+                name="text"
+                rows="8"
+                placeholder="OrbitScan Pro X2 | qty: 6 | cost: 120 | branch: HQ | department: Operations | category: Equipment | subcategory: Barcode Scanners | barcode: 8900001001003"
+              ></textarea>
+            </label>
+            <label>
+              <span>Reference</span>
+              <input name="reference" value="AI-AUTOSTOCK" />
+            </label>
+            <label>
+              <span>Mode</span>
+              <select name="previewOnly">
+                <option value="false">Auto apply to stock</option>
+                <option value="true">Preview only</option>
+              </select>
+            </label>
+            <button type="submit" class="primary-button full-width">
+              Run REVA AutoStock AI
+            </button>
+          </form>
+          <div id="aiAgentResults" class="stack-list"></div>
+          <p id="aiAgentFeedback" class="feedback"></p>
+        </section>
+
+        <section class="panel alerts-panel">
+          <div class="panel-head inline-head">
+            <div>
+              <p class="eyebrow">Enterprise Alerts</p>
+              <h2>Alerts & Notifications</h2>
+            </div>
+          </div>
+          <div id="alertsList" class="stack-list"></div>
+        </section>
+
+        <section class="panel timeline-panel">
+          <div class="panel-head inline-head">
+            <div>
+              <p class="eyebrow">Activity Timeline</p>
+              <h2>Realtime Audit Trail</h2>
+            </div>
+          </div>
+          <div id="activityList" class="timeline-list"></div>
+        </section>
+
+        <section class="panel inventory-panel full-span">
+          <div class="panel-head inline-head">
+            <div>
+              <p class="eyebrow">Smart Stock Grid</p>
+              <h2>Inventory Table</h2>
+            </div>
+            <div class="toolbar">
+              <input
+                id="inventorySearch"
+                class="toolbar-search"
+                placeholder="Search item, barcode, RFID, inventory number"
+              />
+              <button id="exportExcelButton" type="button" class="ghost-button">
+                Export Excel
+              </button>
+              <button id="exportPdfButton" type="button" class="ghost-button">
+                Export PDF
+              </button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Inventory Number</th>
+                  <th>Item</th>
+                  <th>Branch</th>
+                  <th>Category</th>
+                  <th>Barcode</th>
+                  <th>RFID</th>
+                  <th>Qty</th>
+                  <th>AI Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inventoryTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </section>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
