@@ -40,11 +40,15 @@ app.set("trust proxy", 1);
 app.use(
   cors({
     origin(origin, callback) {
-      if (isOriginAllowed(origin)) {
-        return callback(null, true);
-      }
+      function isOriginAllowed(origin) {
+  if (!origin) return true;
 
-      return callback(new Error("Origin not allowed by CORS policy."));
+  if (defaults.allowedOrigins.includes("*")) return true;
+
+  return defaults.allowedOrigins.includes(origin);
+}
+
+      
     },
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
