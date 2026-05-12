@@ -1,20 +1,12 @@
-const express = require("express");
+const router = require("express").Router();
 const jwt = require("jsonwebtoken");
-
-const router = express.Router();
-
-const defaults = require("../config/defaults");
-
-// CHANGE THIS to your actual User model path
 const User = require("../models/User");
 
 router.post("/login", async (req, res) => {
-  console.log("LOGIN REQUEST RECEIVED");
-
   try {
-    const { email, password } = req.body;
+    console.log("LOGIN REQUEST RECEIVED");
 
-    console.log("Email:", email);
+    const { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({
@@ -22,54 +14,50 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    const user = await User.findOne({
-      email: email.toLowerCase(),
-    });
+    const user = await User.findOne({ email });
+
+    console.log("USER FOUND:", user);
 
     if (!user) {
       return res.status(401).json({
-        error: "Invalid email or password",
+        error: "Invalid credentials",
       });
     }
 
     // SIMPLE PASSWORD CHECK
-    // Replace with bcrypt.compare() if using hashed passwords
+    // Replace with bcrypt.compare() if passwords are hashed
     if (user.password !== password) {
       return res.status(401).json({
-        error: "Invalid email or password",
+        error: "Invalid credentials",
       });
     }
 
     const token = jwt.sign(
       {
         id: user._id,
-        email: user.email,
-        role: user.role || "user",
+        role: user.role,
       },
-      defaults.jwtSecret,
+      process.env.JWT_SECRET || "SECRET",
       {
-        expiresIn: defaults.tokenTtl || "12h",
+        expiresIn: "12h",
       }
     );
 
-    console.log("LOGIN SUCCESS");
-
-    return res.status(200).json({
+    return res.json({
       success: true,
       token,
       user: {
         id: user._id,
         email: user.email,
-        name: user.name,
-        role: user.role || "user",
+        role: user.role,
       },
     });
+
   } catch (error) {
     console.error("LOGIN ERROR:", error);
 
     return res.status(500).json({
-      error: "Internal server error",
-      details: error.message,
+      error: error.message,
     });
   }
 });
